@@ -29,6 +29,8 @@ var request = require('request');
 var sprintf = require('sprintf').sprintf;
 var async = require("async");
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
 // The port that this express app will listen on
 var port = process.env.PORT || 7464;
 
