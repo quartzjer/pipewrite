@@ -1,0 +1,19 @@
+{
+   "name": "pipewrite",
+   "version": "0.0.42",
+   "dependencies": {
+   	  "async": "*",
+      "ejs": "*",
+      "express": "*",
+      "querystring": "*",
+      "knox": "0.6.0",
+      "request": "*",
+      "sprintf": "*",
+	  "compress-buffer": "*",
+      "express-partials": "*"
+   },
+   "engines": {
+     "node": "0.10.x",
+     "npm":  "1.2.x"
+   }
+}
