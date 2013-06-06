@@ -66,7 +66,6 @@ app.post('/drain/:service/:user', function(req, res){
   var buckets = {};
   var adding = {};
   // dump into per-day buckets
-  function pad(n){return n<10 ? '0'+n : n};
   req.body.forEach(function(entry){
     if(!entry || entry.type != "data" || !entry.data || !entry.data.created_at) return;
     entry.user = req.params.user;
@@ -126,6 +125,7 @@ function renormalize(entry)
   idr.hash = entry.id;
   entry.idr = urllib.format(idr);
   var dayte = new Date(entry.at);
+  function pad(n){return n<10 ? '0'+n : n};
   entry.day = [dayte.getUTCFullYear(), pad(dayte.getUTCMonth()), pad(dayte.getUTCDate())].join("-");
 }
 
