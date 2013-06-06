@@ -35,6 +35,7 @@ var zlib = require('compress-buffer');
 exports.backend = function (args) {
 
   // TODO, add one auto-retry on 500
+  args.acl = args.acl || "bucket-owner-full-control";
 
   this.client = knox.createClient(args);
 
@@ -84,7 +85,7 @@ exports.backend = function (args) {
     var req = this.client.put(key, {
       "Content-Length": buffer.length,
       "Content-Type": "x-json/gz",
-      "x-amz-acl": "private"
+      "x-amz-acl": args.acl
     });
 
     req.on("response", function (res) {
