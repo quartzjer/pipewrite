@@ -116,6 +116,7 @@ function renormalize(entry)
   entry.oembed = entry.data;
   entry.at = entry.oembed.created_at;
   entry.data = entry.raw;
+  delete entry.raw;
   entry.id = entry.entry_id.toString();
   var idr = {};
   idr.protocol = entry.oembed.type;
