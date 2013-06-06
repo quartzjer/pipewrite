@@ -28,6 +28,7 @@ var express = require('express');
 var request = require('request');
 var sprintf = require('sprintf').sprintf;
 var async = require("async");
+var urllib = require("url");
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
@@ -68,11 +69,11 @@ app.post('/drain/:service/:user', function(req, res){
   function pad(n){return n<10 ? '0'+n : n};
   req.body.forEach(function(entry){
     if(!entry || entry.type != "data" || !entry.data || !entry.data.created_at) return;
-    var dayte = new Date(entry.data.created_at);
-    var day = [dayte.getUTCFullYear(), pad(dayte.getUTCMonth()), pad(dayte.getUTCDate())].join("-");
-    if(!buckets[day]) buckets[day] = [];
-    buckets[day].push(entry);
-    adding[entry.entry_id] = true;
+    entry.user = req.params.user;
+    renormalize(entry);
+    if(!buckets[entry.day]) buckets[entry.day] = [];
+    buckets[entry.day].push(entry);
+    adding[entry.id] = true;
   });
 
   async.forEach(Object.keys(buckets), function(day, cbDay){
@@ -82,7 +83,7 @@ app.post('/drain/:service/:user', function(req, res){
       var existing = [];
       if(buf) try{ existing = JSON.parse(buf) } catch(E){ console.log("couldn't parse", dest, buf.toString()); };
       // skip any being added again
-      existing.forEach(function(entry){ if(!adding[entry.entry_id]) buckets[day].push(entry); });
+      existing.forEach(function(entry){ if(!adding[entry.id]) buckets[day].push(entry); });
       s3.put(dest, new Buffer(JSON.stringify(buckets[day])), cbDay);
     });
   }, function(err){
@@ -110,6 +111,23 @@ app.post('/drain/:service/:user', function(req, res){
     })
   });
 });
+
+function renormalize(entry)
+{
+  entry.oembed = entry.data;
+  entry.at = entry.oembed.created_at;
+  entry.data = entry.raw;
+  entry.id = entry.entry_id.toString();
+  var idr = {};
+  idr.protocol = entry.oembed.type;
+  idr.auth = entry.user;
+  idr.host = entry.service;
+  idr.pathname = "/"+entry.category;
+  idr.hash = entry.id;
+  entry.idr = urllib.format(idr);
+  var dayte = new Date(entry.at);
+  entry.day = [dayte.getUTCFullYear(), pad(dayte.getUTCMonth()), pad(dayte.getUTCDate())].join("-");
+}
 
 
 app.listen(port);
