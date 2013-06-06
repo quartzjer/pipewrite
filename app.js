@@ -113,13 +113,13 @@ app.post('/drain/:service/:user', function(req, res){
 
 function renormalize(entry)
 {
-  entry.oembed = entry.data;
-  entry.at = entry.oembed.created_at;
+  entry.map = entry.data;
+  entry.at = entry.map.created_at;
   entry.data = entry.raw;
   delete entry.raw;
   entry.id = entry.entry_id.toString();
   var idr = {};
-  idr.protocol = entry.oembed.type;
+  idr.protocol = entry.map.type;
   idr.auth = entry.user;
   idr.host = entry.service;
   idr.pathname = "/"+entry.category;
