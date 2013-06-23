@@ -113,13 +113,18 @@ app.post('/drain/:service/:user', function(req, res){
 
 function renormalize(entry)
 {
-  entry.map = entry.data;
+  var old = entry.data;
+  if(old.type == "photo")
+  {
+    entry.image_url = old.url;
+    entry.image_thumbnail = old.thumbnail_url;
+  }
   entry.at = entry.map.created_at;
   entry.data = entry.raw;
   delete entry.raw;
   entry.id = entry.entry_id.toString();
   var idr = {};
-  idr.protocol = entry.map.type;
+  idr.protocol = old.type;
   idr.auth = entry.user;
   idr.host = entry.service;
   idr.pathname = "/"+entry.category;
