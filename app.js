@@ -103,8 +103,10 @@ app.post('/drain/:service/:user', function(req, res){
     s3.get(dest, function(err, buf){
       var existing = {};
       if(buf) try{ existing = JSON.parse(buf) } catch(E){ console.log("couldn't parse", dest, buf.toString()); };
-      Object.keys(index).forEach(function(day){ existing[day] = index[day]; });
-      s3.put(dest, new Buffer(JSON.stringify(index)), function(err){
+      if(!existing.days) existing.days = {};
+      existing.synced = Date.now();
+      Object.keys(index).forEach(function(day){ existing.days[day] = index[day]; });
+      s3.put(dest, new Buffer(JSON.stringify(existing)), function(err){
         if(err) console.log("failed to save",dest,err);
       });
     })
