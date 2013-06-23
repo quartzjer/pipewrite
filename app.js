@@ -119,7 +119,7 @@ function renormalize(entry)
     entry.image_url = old.url;
     entry.image_thumbnail = old.thumbnail_url;
   }
-  entry.at = entry.map.created_at;
+  entry.at = old.created_at;
   entry.data = entry.raw;
   delete entry.raw;
   entry.id = entry.entry_id.toString();
