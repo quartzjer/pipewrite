@@ -96,10 +96,10 @@ app.post('/drain/:service/:user', function(req, res){
       index[day] = buckets[day].length;
     })
     res.send(200);
-    console.log("Saved", JSON.stringify(index));
+    var dest = req.params.service+"/"+req.params.user+"/index.json";
+    console.log("Saved", dest, JSON.stringify(index));
 
     // update index
-    var dest = req.params.service+"/"+req.params.user+"/index.json";
     s3.get(dest, function(err, buf){
       var existing = {};
       if(buf) try{ existing = JSON.parse(buf) } catch(E){ console.log("couldn't parse", dest, buf.toString()); };
@@ -110,6 +110,15 @@ app.post('/drain/:service/:user', function(req, res){
         if(err) console.log("failed to save",dest,err);
       });
     })
+  });
+});
+
+app.get('/index/:service/:user', function(req, res){
+  var dest = req.params.service+"/"+req.params.user+"/index.json";
+  s3.get(dest, function(err, buf){
+    var existing = {};
+    if(buf) try{ existing = JSON.parse(buf) } catch(E){ console.log("couldn't parse", dest, buf.toString()); };
+    res.json(existing);
   });
 });
 

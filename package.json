@@ -6,7 +6,7 @@
       "ejs": "*",
       "express": "*",
       "querystring": "*",
-      "knox": "0.6.0",
+      "knox": "*",
       "request": "*",
       "sprintf": "*",
 	  "compress-buffer": "*",

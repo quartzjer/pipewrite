@@ -65,8 +65,8 @@ exports.backend = function (args) {
         res.on("end", function () {
           cbDone(null, zlib.uncompress(buffer));
         });
-      } else if(res.statusCode === 404){
-        cbDone();
+//      } else if(res.statusCode === 404){
+//        cbDone();
       } else {
         var msg = "";
         res.on("data", function (data) { msg += data.toString(); });
