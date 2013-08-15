@@ -68,7 +68,7 @@ app.post('/drain/:service/:user', function(req, res){
   var syncerr;
   // dump into per-day buckets
   req.body.forEach(function(entry){
-    if(entry && entry.type == "error") syncerr = entry;
+    if(entry && (entry.type == "error" || entry.type == "stop")) syncerr = entry;
     if(!entry || entry.type != "data" || !entry.data || !entry.data.created_at) return;
     entry.user = req.params.user;
     renormalize(entry);
