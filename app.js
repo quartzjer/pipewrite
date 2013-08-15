@@ -65,8 +65,10 @@ app.post('/drain/:service/:user', function(req, res){
   }
   var buckets = {};
   var adding = {};
+  var syncerr;
   // dump into per-day buckets
   req.body.forEach(function(entry){
+    if(entry && entry.type == "error") syncerr = entry;
     if(!entry || entry.type != "data" || !entry.data || !entry.data.created_at) return;
     entry.user = req.params.user;
     renormalize(entry);
@@ -97,7 +99,7 @@ app.post('/drain/:service/:user', function(req, res){
     })
     res.send(200);
     var dest = req.params.service+"/"+req.params.user+"/index.json";
-    console.log("Saved", dest, JSON.stringify(index));
+    console.log("Saved", dest, JSON.stringify(index), syncerr);
 
     // update index
     s3.get(dest, function(err, buf){
@@ -105,6 +107,11 @@ app.post('/drain/:service/:user', function(req, res){
       if(buf) try{ existing = JSON.parse(buf) } catch(E){ console.log("couldn't parse", dest, buf.toString()); };
       if(!existing.days) existing.days = {};
       existing.synced = Date.now();
+      if(syncerr) {
+        existing.error = syncerr;
+      }else{
+        delete existing.error;
+      }
       Object.keys(index).forEach(function(day){ existing.days[day] = index[day]; });
       s3.put(dest, new Buffer(JSON.stringify(existing)), function(err){
         if(err) console.log("failed to save",dest,err);
