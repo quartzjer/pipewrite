@@ -150,7 +150,7 @@ function renormalize(entry)
   entry.idr = urllib.format(idr);
   var dayte = new Date(entry.at);
   function pad(n){return n<10 ? '0'+n : n};
-  entry.day = [dayte.getUTCFullYear(), pad(dayte.getUTCMonth()), pad(dayte.getUTCDate())].join("-");
+  entry.day = [dayte.getUTCFullYear(), pad(dayte.getUTCMonth()+1), pad(dayte.getUTCDate())].join("-");
 }
 
 
