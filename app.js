@@ -84,7 +84,7 @@ app.post('/drain/:service/:user', function(req, res){
       var existing = [];
       if(buf) try{ existing = JSON.parse(buf) } catch(E){ console.log("couldn't parse", dest, buf.toString()); };
       // skip any being added again
-      existing.forEach(function(entry){ if(!adding[entry.id]) buckets[day].push(entry); });
+      existing.forEach(function(entry){ if(!adding[entry.id] && dayok(entry)) buckets[day].push(entry); });
       s3.put(dest, new Buffer(JSON.stringify(buckets[day])), cbDay);
     });
   }, function(err){
@@ -151,6 +151,17 @@ function renormalize(entry)
   var dayte = new Date(entry.at);
   function pad(n){return n<10 ? '0'+n : n};
   entry.day = [dayte.getUTCFullYear(), pad(dayte.getUTCMonth()+1), pad(dayte.getUTCDate())].join("-");
+}
+
+// check old entries to make sure they're ok
+function dayok(entry)
+{
+  if(!entry.day) return true; // only validate ones we created
+  var dayte = new Date(entry.at);
+  function pad(n){return n<10 ? '0'+n : n};
+  var day = [dayte.getUTCFullYear(), pad(dayte.getUTCMonth()+1), pad(dayte.getUTCDate())].join("-");
+  if(entry.day != day) return false;
+  return true;
 }
 
 
